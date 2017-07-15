@@ -28,11 +28,11 @@ npm install ejs --save
 模板引擎的配置位于app.js中：
 ![](IMG2.png)
 把这段代码改为配置ejs模板引擎：
-```
-  app.set('views',path.join(__dirname , 'views') );
-  app.engine('.html', require('ejs').__express);  
-  app.set('view engine', 'html');
-```
+
+	  app.set('views',path.join(__dirname , 'views') );
+	  app.engine('.html', require('ejs').__express);  
+	  app.set('view engine', 'html');
+
 
 #### 第三步：测试
 先在views文件夹创建一个可以正常使用的HTML文件test.html；
@@ -40,3 +40,80 @@ npm install ejs --save
 ![](IMG3.png)
 最后启动服务器，发现主页确实变成了test.html中的内容！
 
+## 连接数据库
+> 配置mongodb参考另一篇文章《安装MongoDB》。
+
+这段代码是用来连接数据库的：
+
+	var mongodb = require("mongodb");
+	var Db = mongodb.Db;
+	var Server = require('mongodb').Server;
+	const url = 'mongodb://localhost:27017/';
+	var db = new Db('messageBoard', new Server('localhost', 27017));
+	
+	function connect(){
+	    return new Promise(function(resolve,reject){
+	        db.open().then(function( db) {
+	            resolve(db)
+	            // Get an additional db
+	            console.log("open MongoDB");
+	        }).catch(function(err){
+	            reject(err);
+	        });
+	    })
+	}
+	
+	exports.connect = connect;
+
+在Express框架根目录中新建一个model文件夹，里面放这个代码的js文件，然后在app.js中引入connect：
+
+	var db = require("./model/connect.js");
+	
+	db.connect().then(function(db){
+	     global.db = db;
+	}).catch(function(err){
+	    console.log(err);
+	});
+
+之后用到数据库的时候用`let myDB = db.collection("message");`即可连接数据库。
+
+## GET和POST请求
+> 使用前后端分离的时候，node的主要作用就是提供get和post接口。
+
+### GET接口：
+
+	router.get('/test', function(req, res) {
+	  let myDB = db.collection("message");	//新建一个数据库的message表连接
+	  let name = req.query.name;	//获取ajax里面的data数据，其中req.query是data全部数据
+	  myDB.find({'name':name}).toArray()	//在message表中查询key值为'name'，值为name的数据
+	    .then(function(result) {
+	      res.send(result);		//查找到之后返回给ajax
+	    })
+	    .catch(function(err){
+	      throw err;
+	    });
+	});
+
+### POST接口：
+
+	router.post("/message",function(req,res){
+	    var message = req.body;
+	    console.log(req.body);
+	    var messageColletion =  db.collection("message");
+	    messageColletion.insertOne({	//数据库插入数据
+	        name:message.name,
+	        age:message.age,
+	        text:message.text
+	    })
+	        .then(function(){
+	            res.json({		//返回json数据
+	                status: 0,
+	                message: "提交成功"
+	            })
+	        })
+	        .catch(function(err){
+	            throw err;
+	        })
+	})
+
+**需要注意的是在get请求中，ajax的data数据用req.query获取，而post请求中用req.body获取。**
