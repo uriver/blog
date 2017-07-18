@@ -1,4 +1,4 @@
-# 由浅入深Node.js——Node简介
+# 深入浅出Node.js——Node简介
 > 朴灵由浅入深node.js第一章笔记。
 
 ## 为什么node使用JavaScript
