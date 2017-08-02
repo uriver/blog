@@ -9,6 +9,13 @@
 
 CSS3引入box-sizing属性，有三个选项：content-box（符合W3C盒模型），border-box（符合IE盒模型），padding-box（只支持主流浏览器）
 
+### @import和link
+link是HTML标签，而@import是CSS的标签（类似border、margin）。
+
+link会在页面显示之前加载，而@import在读取完文件后再加载。
+
+因为@import是CSS标签，不是HTML标签，所以@import样式不能用dom控制。
+
 ### 选择符
 1. id选择器（ # myid） 
 2. 类选择器（.myclassname） 
