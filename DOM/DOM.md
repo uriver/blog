@@ -32,6 +32,8 @@
 
 * className：className="class"为替换元素的class，className+="class"为追加class；
 
+* parentNode：获取该元素节点的父节点
+
 
 ## 2. DOM操作技巧
 ### 2.1 动态脚本
