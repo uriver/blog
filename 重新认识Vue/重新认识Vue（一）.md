@@ -1,4 +1,4 @@
-# 重新认识Vue（一）
+# 重新认识Vue：构造函数
 > 在使用Vue的时候跳过了前面的步骤，而直接用的Vue-cli，模块化的开发导致对Vue本身的使用原理不熟悉，所以现在想由浅入深慢慢探索Vue的实现。  
 > 源码的解析主要都是参考网上的文章。
 
@@ -162,4 +162,39 @@
 构造函数经过四次处理：
 
 第一次被处理时，挂在了Vue原型下的属性和方法；第二次被处理时挂载了Vue的静态属性和方法；第三次处理时添加了web平台特有的配置、组件和指令。第四次处理时让Vue支持template模板。
+
+## 举例分析
+
+	let v = new Vue({
+	    el: '#app',
+	    data: {
+	        a: 1,
+	        b: [1, 2, 3]
+	    }
+	})
+这段代码创建了一个Vue对象，从构造函数分析，它在第一次被处理时调用了_init方法。_init方法在源码里面就不列举出来了，它主要做了这几个事：
+
+使用mergeOption方法来处理调用Vue时传入的参数选项options，然后将返回的值赋给this.$options。
+
+可以在控制台输入v.$options查看，里面有el和data选项，此时 vm.$options.data 的值应该是通过 mergeOptions 合并处理后的mergedInstanceDataFn 函数。
+
+**合并策略：合并的策略就是，子组件的选项不存在，才会使用父组件的选项，如果子组件的选项存在，使用子组件自身的。**
+
+_init方法总的来说，一共按顺序调用了这几个方法：
+
+	initLifecycle(vm)
+	initEvents(vm)
+	callHook(vm, 'beforeCreate')
+	initProps(vm)
+	initMethods(vm)
+	initData(vm)
+	initComputed(vm)
+	initWatch(vm)
+	callHook(vm, 'created')
+	initRender(vm)
+
+
+本例子中只用了initData和initRender，数据绑定和挂载el到#app上。
+
+initData其实就是数据双向绑定，initRender则是Vue的render（渲染）和re-render(重新渲染),双向绑定和渲染毫无疑问是MVVM框架的最最最重点的机制之一，以我的水平理解起来有些困难，但是，硬着头皮也得看下去啊！
 
