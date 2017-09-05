@@ -41,3 +41,45 @@
 	
 	xhr.open("get",url,true);
 	xhr.send(null);
+
+
+### JQuery Ajax
+
+JQuery的Ajax使用方法是最常见的版本：
+
+	$.ajax({
+          url:***,
+		  data:{},
+          dataType:"json",
+          type:'GET',
+          async :false,		//async默认为true —— 同步
+          success:function (data) {
+     	      console.log(data);
+          },
+          error:function(){
+              alert('获取数据失败！')
+          },
+      });
+
+以上Ajax展示了JQuery常用的API，还有一些不常用的：（只列举自己确实使用过的）
+
+* 获取cookie：在前后端分离的项目中不能直接获取cookie，通过设置ajax的xhrFields API可以获取cookie。
+
+		xhrFields:{
+			withCredentials:true
+		},
+
+### Axios
+
+Axios是VUE官方推荐的Ajax模块，用法如下：
+
+	this.axios({	//这里使用this是因为VUE将axios方法放入了VUE对象的原型中。
+		url:***,
+		params:{},
+		method: 'get',
+	}).then((res)=> {
+		console.log(res.data);
+	})
+
+axios中，发送get请求传递数据要用参数params；后端接受GET请求要用参数req.query;  
+post请求传递数据用参数data，后端接收POST请求要用参数req.body。
